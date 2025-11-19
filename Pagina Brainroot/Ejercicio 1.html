@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi primer ejercicio</title>
+  <link rel="icon" type="image/jpeg" href="willyrexicono.jpeg" />
+  <link rel="stylesheet" href="Ejercicio1.css">
+</head>
+
+<body>
+  <button id="toggleBtn">Modo: DVD</button>
+
+  <header>
+    <nav>
+      <ul>
+        <li><a href="https://www.youtube.com/user/Willyrex">Willyrex</a></li>
+        <li><a href="https://www.youtube.com/watch?v=04YL5pxP5WU">Donpollo</a></li>
+        <li><a href="https://www.youtube.com/shorts/-r2Z9ZFFork">Sigma</a></li>
+      </ul>
+    </nav>
+
+    <nav>
+      <ol>
+        <li><a href="http://127.0.0.1:5500/Ejercicio%201.html">Skibidi</a></li>
+        <li>Gooner</li>
+        <li>rata</li>
+      </ol>
+    </nav>
+  </header>
+
+  <h1>Hola mundo</h1>
+  <h2>Hola mundo</h2>
+  <h3>Hola mundo</h3>
+  <h4>Hola mundo</h4>
+  <h5>Hola mundo</h5>
+  <h6>Hola mundo</h6>
+
+  <img id="dvd" src="willyrexicono.jpeg" alt="Willyrex" />
+
+  <div id="videoContainer">
+    <video src="video SS.mp4" autoplay loop controls></video>
+      <audio controls autoplay loop
+      src="WAITWAITWAIT WHAT DA HELLLLL WAAZZZAAAA (quest ah dog sound effect) - John_YouTube.mp3"></audio>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/2-qyUSTYtcs?si=ohMDcVui8UByiwOo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </div>
+
+  <script>
+    const dvd = document.getElementById("dvd");
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    let mode = "dvd";
+    let x = 100, y = 100;
+    let dx = 3, dy = 2;
+    let scale = 1;
+    let growing = true;
+
+    const colors = ["red", "lime", "yellow", "cyan", "magenta", "white", "blue", "orange"];
+
+    function cambiarColor() {
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      dvd.style.filter = `drop-shadow(0 0 15px ${color})`;
+    }
+
+    function moverDVD() {
+      const anchoPantalla = window.innerWidth;
+      const altoPantalla = window.innerHeight;
+      const anchoImg = dvd.offsetWidth;
+      const altoImg = dvd.offsetHeight;
+
+      x += dx;
+      y += dy;
+
+      if (x <= 0 || x + anchoImg >= anchoPantalla) {
+        dx *= -1;
+        cambiarColor();
+      }
+      if (y <= 0 || y + altoImg >= altoPantalla) {
+        dy *= -1;
+        cambiarColor();
+      }
+
+      if (growing) {
+        scale += 0.01;
+        if (scale >= 1.3) growing = false;
+      } else {
+        scale -= 0.01;
+        if (scale <= 0.8) growing = true;
+      }
+
+      dvd.style.left = x + "px";
+      dvd.style.top = y + "px";
+      dvd.style.transform = `scale(${scale})`;
+    }
+
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener("mousemove", e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function moverCursor() {
+      x += (mouseX - x - dvd.offsetWidth / 2) * 0.01;
+      y += (mouseY - y - dvd.offsetHeight / 2) * 0.01;
+      dvd.style.left = x + "px";
+      dvd.style.top = y + "px";
+
+      if (growing) {
+        scale += 0.01;
+        if (scale >= 1.3) growing = false;
+      } else {
+        scale -= 0.01;
+        if (scale <= 0.8) growing = true;
+      }
+
+      dvd.style.transform = `scale(${scale})`;
+    }
+
+    function animar() {
+      if (mode === "dvd") moverDVD();
+      else moverCursor();
+      requestAnimationFrame(animar);
+    }
+
+    animar();
+
+    toggleBtn.addEventListener("click", () => {
+      mode = mode === "dvd" ? "cursor" : "dvd";
+      toggleBtn.textContent = "Modo: " + (mode === "dvd" ? "DVD" : "Cursor");
+    });
+  </script>
+</body>
+
+</html>

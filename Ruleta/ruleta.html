@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruleta Casino</title>
+<link rel="stylesheet" href="ruleta.css">
+</head>
+<body>
+
+<h2>🎰 Ruleta del Casino 🎲</h2>
+<div id="dinero">💰 Dinero: 1000€</div>
+
+<!-- Botones de apuesta con input de cantidad -->
+<div id="apuestas">
+  <div class="apuesta-contenedor">
+    <button class="apuesta" data-tipo="par">Par</button>
+    <input type="number" class="cantidad" value="0" min="0">
+  </div>
+  <div class="apuesta-contenedor">
+    <button class="apuesta" data-tipo="impar">Impar</button>
+    <input type="number" class="cantidad" value="0" min="0">
+  </div>
+  <div class="apuesta-contenedor">
+    <button class="apuesta" data-tipo="rojo">Rojo</button>
+    <input type="number" class="cantidad" value="0" min="0">
+  </div>
+  <div class="apuesta-contenedor">
+    <button class="apuesta" data-tipo="negro">Negro</button>
+    <input type="number" class="cantidad" value="0" min="0">
+  </div>
+</div>
+
+<div class="ruleta-container">
+  <div class="ruleta"></div>
+  <div id="numeros"></div>
+  <div class="centro"></div>
+  <div class="bola" id="bola"></div>
+</div>
+<button id="lanzar">Lanzar bola</button>
+
+<script src="ruleta.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+body {
+    background: #0b0b0b;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+#dinero {
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+#apuestas {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.apuesta-contenedor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+#apuestas .apuesta {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #333;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#apuestas .apuesta.active {
+    background: #ffd700;
+    color: black;
+}
+
+.cantidad {
+    width: 60px;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background: #222;
+    color: white;
+}
+
+.ruleta-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+}
+
+.ruleta {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 5px solid #333;
+    background: conic-gradient(
+        green 0deg 9.72973deg,
+        red 9.72973deg 19.45946deg,
+        black 19.45946deg 29.18919deg,
+        red 29.18919deg 38.91892deg,
+        black 38.91892deg 48.64865deg,
+        red 48.64865deg 58.37838deg,
+        black 58.37838deg 68.10811deg,
+        red 68.10811deg 77.83784deg,
+        black 77.83784deg 87.56757deg,
+        red 87.56757deg 97.29730deg,
+        black 97.29730deg 107.02703deg,
+        red 107.02703deg 116.75676deg,
+        black 116.75676deg 126.48649deg,
+        red 126.48649deg 136.21622deg,
+        black 136.21622deg 145.94595deg,
+        red 145.94595deg 155.67568deg,
+        black 155.67568deg 165.40541deg,
+        red 165.40541deg 175.13514deg,
+        black 175.13514deg 184.86487deg,
+        red 184.86487deg 194.59460deg,
+        black 194.59460deg 204.32433deg,
+        red 204.32433deg 214.05406deg,
+        black 214.05406deg 223.78379deg,
+        red 223.78379deg 233.51352deg,
+        black 233.51352deg 243.24325deg,
+        red 243.24325deg 252.97298deg,
+        black 252.97298deg 262.70271deg,
+        red 262.70271deg 272.43244deg,
+        black 272.43244deg 282.16217deg,
+        red 282.16217deg 291.89190deg,
+        black 291.89190deg 301.62163deg,
+        red 301.62163deg 311.35136deg,
+        black 311.35136deg 321.08109deg,
+        red 321.08109deg 330.81082deg,
+        black 330.81082deg 340.54055deg,
+        red 340.54055deg 350.27028deg,
+        black 350.27028deg 360deg
+    );
+    transform: rotate(-6deg); /* Ajuste para que el verde quede arriba */
+}
+
+.centro {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120px; /* círculo central más pequeño */
+    height: 120px;
+    background: #0b0b0b;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.bola {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%) rotate(0deg);
+    transform-origin: 0 190px;
+    z-index: 3;
+}
+
+.numero {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: white;
+    z-index: 2;
+}
+
+button#lanzar {
+    margin-top: 40px;
+    padding: 10px 20px;
+    border: none;
+    background: #e50914;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button#lanzar:hover {
+    background: #ff202f;
+}

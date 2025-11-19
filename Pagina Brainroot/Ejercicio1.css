@@ -1,0 +1,124 @@
+body 
+{
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+body::before 
+{
+    content: "";
+  position: fixed;
+  inset: -1000%; /* cubre más allá de la pantalla */
+  background: conic-gradient(from 0deg,#ff0000, #ff8c00, #ffff00, #11ff00, #00ffff, #0000ff, #a200ff, #ff00e1, #ff0000);
+  animation: girar 0.25s linear infinite;
+  z-index: -1;
+  transform-origin: center center;
+}
+
+@keyframes girar 
+{
+    0% {transform: rotate(0deg);}
+
+    100% {transform: rotate(360deg);}
+}
+
+a {
+    color: #ff00ff;
+    font-weight: bold;
+    font-size: 1.2em;
+    text-shadow:
+        0 0 5px #ff00ff,
+        0 0 10px #ff00ff,
+        0 0 20px #ff00ff,
+        0 0 30px #ff00ff;
+    animation: parpadeo 1.2s infinite alternate;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+a:hover {
+    transform: scale(1.1);
+    text-shadow:
+        0 0 10px #ff66ff,
+        0 0 20px #ff66ff,
+        0 0 40px #ff66ff,
+        0 0 80px #ff66ff;
+}
+
+@keyframes parpadeo {
+    from {
+        opacity: 1;
+        text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff00ff, 0 0 25px #ff00ff;
+    }
+
+    to {
+        opacity: 0.7;
+        text-shadow: 0 0 2px #ff00ff, 0 0 6px #ff00ff, 0 0 10px #ff00ff;
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li {
+    color: #ffffff;
+    text-shadow: 0 0 5px #fff, 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+nav ul,
+nav ol {
+    list-style: none;
+    padding: 0;
+}
+
+#dvd {
+    position: absolute;
+    width: 200px;
+    filter: drop-shadow(0 0 15px white);
+    transition: filter 0.3s linear;
+    will-change: transform, left, top;
+}
+
+#toggleBtn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #ff00ff;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    text-shadow: 0 0 5px black;
+    box-shadow: 0 0 10px #ff00ff;
+    z-index: 1000;
+}
+
+#toggleBtn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px #fff;
+}
+
+#videoContainer {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+}
+
+#videoContainer video {
+    width: 250px;
+    height: 450px;
+    object-fit: cover;
+    border: 3px solid #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 20px #ff00ff;
+}
