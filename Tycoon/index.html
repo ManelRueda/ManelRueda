@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tycoon Ultra Avanzado</title>
+    <link rel="stylesheet" href="tycoon.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Tycoon Ultra Avanzado</h1>
+
+        <div class="stats">
+            <p>Dinero: $<span id="dinero">0</span></p>
+            <p>Ingresos por segundo: $<span id="ips">0</span></p>
+            <p>Nivel: <span id="nivel">1</span></p>
+            <p>Negocios comprados: <span id="negocios">0</span></p>
+        </div>
+
+        <div class="actions">
+            <button id="generar">Generar dinero manual (+$1)</button>
+            <button id="guardar">Guardar progreso</button>
+        </div>
+
+        <div class="tienda">
+            <h2>Tienda de negocios</h2>
+            <div class="items"></div>
+        </div>
+
+        <div class="upgrades">
+            <h2>Mejoras</h2>
+            <div class="upgrades-list"></div>
+        </div>
+
+        <div class="eventos">
+            <h2>Eventos Aleatorios</h2>
+            <p id="evento">Ningún evento activo</p>
+        </div>
+
+        <div class="graficos">
+            <h2>Gráfico de Dinero</h2>
+            <canvas id="graficoDinero" width="400" height="200"></canvas>
+        </div>
+
+    </div>
+
+    <script src="tycoon.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to right, #ece9e6, #ffffff);
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: #fff;
+    padding: 30px 50px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    text-align: center;
+    width: 500px;
+}
+
+h1, h2 {
+    margin-bottom: 15px;
+}
+
+.stats p {
+    font-size: 1.1em;
+    margin: 5px 0;
+}
+
+.actions button,
+.tienda button,
+.upgrades button {
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background: #4CAF50;
+    color: white;
+    transition: 0.2s;
+}
+
+.actions button:hover,
+.tienda button:hover,
+.upgrades button:hover {
+    background: #45a049;
+    transform: scale(1.05);
+}
+
+.tienda, .upgrades, .eventos, .graficos {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.item, .upgrade {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.item button, .upgrade button {
+    flex-shrink: 0;
+}
