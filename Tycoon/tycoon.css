@@ -10,19 +10,13 @@ body {
     background: #fff;
     padding: 30px 50px;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    width: 600px;
     text-align: center;
-    width: 500px;
 }
 
-h1, h2 {
-    margin-bottom: 15px;
-}
-
-.stats p {
-    font-size: 1.1em;
-    margin: 5px 0;
-}
+h1,h2 { margin-bottom: 15px; }
+.stats p { margin: 5px 0; font-size: 1.1em; }
 
 .actions button,
 .tienda button,
@@ -45,17 +39,22 @@ h1, h2 {
     transform: scale(1.05);
 }
 
-.tienda, .upgrades, .eventos, .graficos {
-    margin-top: 20px;
-    text-align: left;
+.tienda, .upgrades, .eventos, .graficos, .misiones { margin-top: 20px; text-align: left; }
+.item, .upgrade { display: flex; justify-content: space-between; margin: 5px 0; }
+.item button, .upgrade button { flex-shrink: 0; }
+
+.progress-bar {
+    background: #ddd;
+    border-radius: 5px;
+    height: 15px;
+    width: 100%;
+    margin-top: 5px;
 }
 
-.item, .upgrade {
-    display: flex;
-    justify-content: space-between;
-    margin: 5px 0;
-}
-
-.item button, .upgrade button {
-    flex-shrink: 0;
+.progress {
+    background: #4CAF50;
+    height: 15px;
+    border-radius: 5px;
+    width: 0%;
+    transition: width 0.5s;
 }
