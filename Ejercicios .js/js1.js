@@ -182,3 +182,4 @@ while (intento !== numeroSecreto)
         break;
     }
 }
+alert("Has hacertado en "+ intento + "intentos");
