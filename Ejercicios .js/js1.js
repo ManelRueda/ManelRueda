@@ -154,10 +154,12 @@ let numeroSecreto = Math.floor(Math.random() * 100) + 1;
 console.log("Número secreto (para depuración):", numeroSecreto);
 
 let intento = 0;
+let respuesta = 0;
 
 alert("¡Bienvenido al juego de adivinar el número!");
 while (intento !== numeroSecreto) 
 {
+    respuesta++;
     intento = (prompt("Introduce un número entre 1 y 100:"));
     
     
@@ -178,7 +180,7 @@ while (intento !== numeroSecreto)
     } 
     else 
     {
-        alert("Has acertado en "+ intento + "intentos");
+        alert("Has acertado en "+ respuesta + " intentos");
         console.log(`¡Felicidades! Has acertado el número ${numeroSecreto}`);
         break;
     }
