@@ -178,8 +178,9 @@ while (intento !== numeroSecreto)
     } 
     else 
     {
+        alert("Has acertado en "+ intento + "intentos");
         console.log(`¡Felicidades! Has acertado el número ${numeroSecreto}`);
         break;
     }
 }
-alert("Has hacertado en "+ intento + "intentos");
+
