@@ -181,6 +181,7 @@ while (intento !== numeroSecreto)
     else 
     {
         alert("Has acertado en "+ respuesta + " intentos");
+        
         console.log(`¡Felicidades! Has acertado el número ${numeroSecreto}`);
         break;
     }
