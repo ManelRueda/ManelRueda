@@ -1,0 +1,11 @@
+*
+{
+border: solid black 1px;
+}
+
+.tecla
+{
+width: 50px;
+display: flex;
+justify-content: center;
+}
