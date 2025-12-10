@@ -185,8 +185,8 @@
 
 #portfolio .galeria-portfolio {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas fijas */
-    grid-template-rows: repeat(2, 200px); /* 2 filas de 200px */
+    grid-template-columns: repeat(3, 1fr); 
+    grid-template-rows: repeat(2, 200px); 
     gap: 20px;
     width: 100%;
     max-width: 1000px;
@@ -291,7 +291,7 @@
     text-align: center;
 }
 
-#testimonios .testimonio-contenedor { /* NUEVO */
+#testimonios .testimonio-contenedor { 
     display: flex;
     align-items: center;
     gap: 20px;
@@ -354,7 +354,7 @@
     gap: 10px;
     font-size: 1.1rem;
     justify-content: flex-start;
-    min-width: 300px; /* Para alinear las imágenes de todos los items */
+    min-width: 300px; 
 }
 
 #contacto .item-contacto img {
@@ -374,7 +374,7 @@
     color: #e68a00;
 }
 
-/* Texto de ubicación en naranja */
+
 #contacto .item-contacto:nth-child(3) {
     color: #ff9800;
 }

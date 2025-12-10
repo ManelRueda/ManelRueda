@@ -1,11 +1,17 @@
-*
+
+
+#teclado
 {
-border: solid black 1px;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+    width: 200px;
 }
 
 .tecla
 {
-width: 50px;
-display: flex;
-justify-content: center;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
