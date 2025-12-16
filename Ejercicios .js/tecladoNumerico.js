@@ -14,7 +14,6 @@ function palabraSecreta() {
 
 }
 
-
 function crearTeclado() {
     //Cojo el div del teclado, para luego ir añadiendo
     let teclado = document.getElementById("teclado");
@@ -118,6 +117,17 @@ function cambiarFondoTecla(i, tecla) {
     }
 
     return tecla;
+}
+
+function comprobar() {
+    let miTexto = document.getElementById("miTexto");
+    if (miTexto.textContent === palabra) {
+        miTexto.style.background = "green";
+        alert("¡Has acertado la palabra secreta: " + palabra + "!");
+    } else {
+        miTexto.style.background = "red";
+        alert("Palabra incorrecta. Inténtalo de nuevo.");
+    }
 }
 
 crearTeclado();
