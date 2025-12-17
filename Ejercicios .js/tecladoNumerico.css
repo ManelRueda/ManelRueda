@@ -1,15 +1,52 @@
-
-
+*{border: 0px solid black;}
+body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h1
+{
+    text-align: center;
+    margin: 50px;
+    font-size: 70px;
+}
+#miTexto
+{
+display: flex;
+justify-content: center;
+align-items: center ;
+height: 100px;
+width: 700px;
+font-size: 45px;
+border: 1px solid black;
+}
+/* Estilo del teclado */
 #teclado
 {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(10, 100px);
     gap: 10px;
-    width: 700px;
+    justify-content: center;
+    margin: 50px;
     
 }
-
-.tecla
+#botones
+{
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    width: 1000px;
+    
+}
+/* Estilo de las teclas */
+.teclaLetra
+{
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    width: 100px;
+}
+.teclaNumero
 {
     border: 1px solid black;
     display: flex;
@@ -17,17 +54,36 @@
     justify-content: center;
     width: 100px;
 }
-
+/* Estilo de los botones */
+.comprobar
+{
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 300px;
+    height: 30px;
+    background-color: aqua;
+    cursor: pointer;
+}
 .borrarLettra
 {
     border: 1px solid black;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100px;
+    width: 300px;
     height: 30px;
     background-color: aqua;
-    margin-top: 10px;
-    text-align: center;
     cursor: pointer;
+}
+#botones
+{
+    display: flex;
+    gap: 10px;
+}
+/* Estilo de la matriz */
+#matrizDiv
+{
+    border: 1px solid black;
 }

@@ -2,15 +2,15 @@
 
 let palabra = "";
 function palabraSecreta() {
-   fetch('https://random-word-api.herokuapp.com/word?lang=es&length=5')
-       .then(response => response.json())
-       .then(data => {
-           palabra = data[0]; // La API devuelve un array, ej: ["perro"]
-          
-           palabra=palabra.toUpperCase();
-           console.log("Tu palabra secreta es:", palabra);
+    fetch('https://random-word-api.herokuapp.com/word?lang=es&length=5')
+        .then(response => response.json())
+        .then(data => {
+            palabra = data[0]; // La API devuelve un array, ej: ["perro"]
 
-       });
+            palabra = palabra.toUpperCase();
+            console.log("Tu palabra secreta es:", palabra);
+
+        });
 
 }
 
@@ -19,53 +19,33 @@ function crearTeclado() {
     let teclado = document.getElementById("teclado");
 
     for (let i = 65; i < 91; i++) {
-        //Creo la tecla
+        //Creo la tecla con la letra
         let tecla = document.createElement("div");
         tecla.innerHTML = "<p>" + String.fromCharCode(i) + "</p>";
-        tecla.className = "tecla";
-
-        tecla = cambiarFondoTecla(i, tecla);
-
+        tecla.className = "teclaLetra";
         tecla.setAttribute("onclick", "escribeTecla('" + String.fromCharCode(i) + "')");
-
-        //Añado la tecla al teclado
-        teclado.appendChild(tecla);
-
-
-    }
-
-    for (let i = 0; i < 10; i++) {
-        //Creo la tecla
-        let tecla = document.createElement("div");
-        tecla.innerHTML = "<p>" + i + "</p>";
-        tecla.className = "tecla";
-
-        tecla = cambiarFondoTecla(i, tecla);
-
-        tecla.setAttribute("onclick", "escribeTecla('" + i + "')");
-
         //Añado la tecla al teclado
         teclado.appendChild(tecla);
     }
-
-    let borrar = document.querySelector(".borrarLettra");
-    if (borrar) {
-        borrar.addEventListener("click", borrarLetra);
-    }
-
+    /*
+        for (let i = 0; i < 10; i++) {
+            //Creo la tecla con el numero
+            let tecla = document.createElement("div");
+            tecla.innerHTML = "<p>" + i + "</p>";
+            tecla.className = "teclaNumero";
+            tecla.setAttribute("onclick", "escribeTecla('" + i + "')");
+            //Añado la tecla al teclado
+            teclado.appendChild(tecla);
+        }
+            */
     palabraSecreta();
 }
 
 function escribeTecla(letra) {
     console.log(letra);
     let miTexto = document.getElementById("miTexto");
-
     if (miTexto.textContent.length < 5) {
         miTexto.textContent += letra;
-        
-    }
-    else {
-        miTexto.style.color = "red";
     }
 }
 
@@ -74,60 +54,46 @@ function borrarLetra() {
     if (miTexto.textContent.length > 0) {
         miTexto.textContent = miTexto.textContent.substring(0, miTexto.textContent.length - 1);
         miTexto.style.color = "black";
+        miTexto.style.background = "white";
     }
-}
-
-function esPrimo(num) {
-    if (num < 2) return false;        // 0 y 1 no son primos
-    let limite = Math.sqrt(num);      // optimización
-
-    for (let i = 2; i <= limite; i++) {
-        if (num % i === 0) {
-            return false;             // si es divisible, no es primo
-        }
-    }
-    return true;                       // si no tuvo divisores, es primo
-}
-
-function cambiarFondoTecla(i, tecla) {
-    if ((i % 2) == 0) {
-        //poner fondo azul
-        tecla.style.background = "blue";
-        tecla.style.color = "white";
-    }
-    if ((i % 5) == 0) {
-        //poner fondo amarillo
-        tecla.style.background = "yellow";
-
-    }
-    if ((i % 3) == 0) {
-        //poner fondo rojo
-        tecla.style.background = "red";
-        tecla.style.color = "white";
-    }
-    if ((i % 10) == 0) {
-        //poner fondo naranja
-        tecla.style.background = "orange";
-
-    }
-    if (esPrimo(i)) {
-        //poner fondo verde
-        tecla.style.background = "green";
-        tecla.style.color = "white";
-    }
-
-    return tecla;
 }
 
 function comprobar() {
     let miTexto = document.getElementById("miTexto");
     if (miTexto.textContent === palabra) {
-        miTexto.style.background = "green";
+        miTexto.style.background = "LightGreen";
         alert("¡Has acertado la palabra secreta: " + palabra + "!");
     } else {
-        miTexto.style.background = "red";
+        miTexto.style.background = "Salmon";
         alert("Palabra incorrecta. Inténtalo de nuevo.");
     }
 }
 
+function crearMatriz() {
+    //Cojo el div del teclado, para luego ir añadiendo
+    let matrizDiv = document.getElementById("matrizDiv");
+
+    for (let i = 65; i < 91; i++) {
+        //Creo la tecla con la letra
+        const matriz = [
+            [1, 2, 3, 4, 5],
+            [6, 7, 8, 9, 10],
+            [11, 12, 13, 14, 15],
+            [16, 17, 18, 19, 20],
+            [21, 22, 23, 24, 25],
+            [26, 27, 28, 29, 30]
+        ];
+        let fila = document.createElement("div");
+        fila.className = "filaMatriz";
+        for (let j = 0; j < matriz[i - 65].length; j++) {
+            let celda = document.createElement("div");
+            celda.className = "celdaMatriz";
+            celda.textContent = matriz[i - 65][j];
+            fila.appendChild(celda);
+        }
+        matrizDiv.appendChild(fila);
+    }
+}
+
 crearTeclado();
+crearMatriz();
