@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // --------------------------- A. CONFIGURACIÓN BÁSICA ---------------------------
 //Escene
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x28b1b1); // Color de fondo gris oscuro
+scene.background = new THREE.Color(0x202020); // Color de fondo gris oscuro
 
 //1. Camara
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -29,63 +29,140 @@ scene.add(dirLight);
 // --------------------------- C. OBJETOS ---------------------------
 // Vamos a crear un cubo pero con material que reaccione a la luz
 
-// ----- Tronco -----
-const tronco = new THREE.CylinderGeometry(1,1,3);
-const troncoMaterial = new THREE.MeshStandardMaterial({
-    color: 0x00ff88,
+// ----- Sombrero -----
+const sombrero = new THREE.CylinderGeometry(1,1,2);
+const sombreroMaterial = new THREE.MeshStandardMaterial({
+    color: 0x5F5F63,
     roughness: 0.2, // Qué tan áspero es
     metalness: 0.5  // Qué tan metálico es
-    
 });
-const Cylinder = new THREE.Mesh(tronco, troncoMaterial);
+const Sombrero = new THREE.Mesh(sombrero, sombreroMaterial);
+Sombrero.position.set(0,4,0);
+
+const visera = new THREE.BoxGeometry( 1.5, 0.1, 1 );
+const Visera = new THREE.Mesh( visera, sombreroMaterial );
+Visera.position.set(0,3.05,1);
 
 // ----- Cabeza -----
-const esfera = new THREE.IcosahedronGeometry( 1, 5 );
-IcosahedronGeometry.position.set(0,3,0)
+const esfera = new THREE.IcosahedronGeometry( 1, 5);
 const cabezaMaterial = new THREE.MeshStandardMaterial({
-    color: 0x00ff88,
+    color: 0xF7C788,
     roughness: 0.2, // Qué tan áspero es
     metalness: 0.5  // Qué tan metálico es
     
 });
 const IcosahedronGeometry = new THREE.Mesh(esfera, cabezaMaterial);
+IcosahedronGeometry.position.set(0,2.5,0)
 
-// ----- Piernas -----
-const piernaD = new THREE.CylinderGeometry(0.3,0.3,4);
-PiernaD.position.set(0.5,-3,0)
-
-const piernaI = new THREE.CylinderGeometry(0.3,0.3,4);
-PiernaI.position.set(-0.5,-3,0)
-
-const piernasMaterial = new THREE.MeshStandardMaterial({
-    color: 0x00ff88,
+// ----- Ojos -----
+const ojoGeom = new THREE.SphereGeometry(0.2,32,32);
+const ojoMaterial = new THREE.MeshStandardMaterial({
+    color: 0x000000,
     roughness: 0.2, // Qué tan áspero es
     metalness: 0.5  // Qué tan metálico es
     
 });
+const OjoD = new THREE.Mesh(ojoGeom, ojoMaterial);
+OjoD.position.set(0.4,2.7,0.9)
 
-const PiernaI = new THREE.Mesh(piernaI, piernasMaterial);
-const PiernaD = new THREE.Mesh(piernaD, piernasMaterial);
+const OjoI = new THREE.Mesh(ojoGeom, ojoMaterial);
+OjoI.position.set(-0.4,2.7,0.9)
+
+// ----- Boca -----
+const bocaGeom = new THREE.BoxGeometry(0.5, 0.1, 0.2);
+const bocaMaterial = new THREE.MeshStandardMaterial({
+    color: 0x000000,
+    roughness: 0.2, // Qué tan áspero es
+    metalness: 0.5  // Qué tan metálico es
+
+});
+const Boca = new THREE.Mesh(bocaGeom, bocaMaterial);
+Boca.position.set(0,2.3,1);
+
+// ----- Tronco -----
+const troncoSuperior = new THREE.CylinderGeometry(1,1,2.2);
+const troncoSuperiorMaterial = new THREE.MeshStandardMaterial({
+    color: 0xFF0000,
+    roughness: 0.2, // Qué tan áspero es
+    metalness: 0.5  // Qué tan metálico es
+    
+});
+const TroncoS = new THREE.Mesh(troncoSuperior, troncoSuperiorMaterial);
+TroncoS.position.set(0,0.35,0)
+
+const troncoInferior = new THREE.CylinderGeometry(1,1,0.5);
+const troncoInferiorMaterial = new THREE.MeshStandardMaterial({
+    color: 0x1A3489,
+    roughness: 0.2, // Qué tan áspero es
+    metalness: 0.5  // Qué tan metálico es
+    
+});
+const TroncoI = new THREE.Mesh(troncoInferior, troncoInferiorMaterial);
+TroncoI.position.set(0,-1,0)
 
 // ----- Brazos -----
-const brazoD = new THREE.CylinderGeometry(0.3,0.3,3);
-BrazoD.position.set(1,-0.5,0)
-
-const brazoI = new THREE.CylinderGeometry(0.3,0.3,3);
-BrazoI.position.set(-1,-0.5,0)
-
-const brazosMaterial = new THREE.MeshStandardMaterial({
-    color: 0x00ff88,
+const brazosGeom = new THREE.CylinderGeometry(0.3,0.3,3);
+const brazoMaterial = new THREE.MeshStandardMaterial({
+    color: 0xFF0000,
     roughness: 0.2, // Qué tan áspero es
     metalness: 0.5  // Qué tan metálico es
     
 });
+const BrazoD = new THREE.Mesh(brazosGeom, brazoMaterial);
+BrazoD.position.set(1,1.4,0)
 
-const BrazoI = new THREE.Mesh(brazoI, brazosMaterial);
-const BrazoD = new THREE.Mesh(brazoD, brazosMaterial);
+const BrazoI = new THREE.Mesh(brazosGeom, brazoMaterial);
+BrazoI.position.set(-1,1.4,0)
+
+brazosGeom.translate(0,-1.5,0);
+BrazoD.rotation.z = Math.PI /10;
+BrazoI.rotation.z = -Math.PI /10;
+
+// ----- Manos -----
+const manoGeom = new THREE.SphereGeometry(0.3,32,32);
+const manoMaterial = new THREE.MeshStandardMaterial({
+    color: 0xF7C788,
+    roughness: 0.2, // Qué tan áspero es
+    metalness: 0.5  // Qué tan metálico es
+    
+});
+const ManoD = new THREE.Mesh(manoGeom, manoMaterial);
+ManoD.position.set(-1.95,-1.5,0)
+
+const ManoI = new THREE.Mesh(manoGeom, manoMaterial);
+ManoI.position.set(1.95,-1.5,0)
+
+
+// ----- Piernas -----
+const piernasGeom = new THREE.CylinderGeometry(0.3,0.3,4);
+const piernaMaterial = new THREE.MeshStandardMaterial({
+    color: 0x1A3489,
+    roughness: 0.2, // Qué tan áspero es
+    metalness: 0.5  // Qué tan metálico es
+    
+});
+const PiernaD = new THREE.Mesh(piernasGeom, piernaMaterial);
+PiernaD.position.set(0.5,-3,0)
+
+const PiernaI = new THREE.Mesh(piernasGeom, piernaMaterial);
+PiernaI.position.set(-0.5,-3,0)
+
+// ----- Zapatos -----
+const zapatosGeom = new THREE.SphereGeometry(0.4,32,32);
+const zapatosMaterial = new THREE.MeshStandardMaterial({
+    color: 0x000000,
+    roughness: 0.2, // Qué tan áspero es
+    metalness: 0.5  // Qué tan metálico es
+
+});
+const ZapatoD = new THREE.Mesh(zapatosGeom, zapatosMaterial);
+ZapatoD.position.set(0.5,-5,0)
+
+const ZapatoI = new THREE.Mesh(zapatosGeom, zapatosMaterial);
+ZapatoI.position.set(-0.5,-5,0)
 
 // ----- Crear -----
-scene.add(Cylinder,IcosahedronGeometry,PiernaD,PiernaI,BrazoD,BrazoI);
+scene.add(TroncoS,TroncoI,IcosahedronGeometry,PiernaD,PiernaI,BrazoD,BrazoI,Sombrero,Visera,OjoD,OjoI,Boca,ManoD,ManoI,ZapatoD,ZapatoI);
 
 // --------------------------- D. CONTROLES (La navegación) ---------------------------
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -95,6 +172,10 @@ controls.enableDamping = true; // Añade inercia al movimiento (más suave)
 function animate() {
     requestAnimationFrame(animate);
 
+// ----- Animacion Brazos -----
+    const time = Date.now() * 0.002;
+    BrazoD.rotation.x = Math.PI /10 + Math.sin(time) * 0.2;
+    BrazoI.rotation.x = -Math.PI /10 - Math.sin(time) * 0.2;
 
     // Pequeña rotación automática
     //---cube.rotation.y += 0.005;
