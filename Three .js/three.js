@@ -127,14 +127,18 @@ const manoMaterial = new THREE.MeshStandardMaterial({
     
 });
 const ManoD = new THREE.Mesh(manoGeom, manoMaterial);
-ManoD.position.set(-1.95,-1.5,0)
+ManoD.position.set(-2.45,-0.2,0.5)
 
 const ManoI = new THREE.Mesh(manoGeom, manoMaterial);
-ManoI.position.set(1.95,-1.5,0)
+ManoI.position.set(2.45,-0.2,-0.5)
+
+manoGeom.translate(0,-1.5,0);
+ManoD.rotation.z = Math.PI /10;
+ManoI.rotation.z = -Math.PI /10;
 
 
 // ----- Piernas -----
-const piernasGeom = new THREE.CylinderGeometry(0.3,0.3,4);
+const piernasGeom = new THREE.CylinderGeometry(0.3,0.2,4);
 const piernaMaterial = new THREE.MeshStandardMaterial({
     color: 0x1A3489,
     roughness: 0.2, // Qué tan áspero es
@@ -148,7 +152,7 @@ const PiernaI = new THREE.Mesh(piernasGeom, piernaMaterial);
 PiernaI.position.set(-0.5,-3,0)
 
 // ----- Zapatos -----
-const zapatosGeom = new THREE.SphereGeometry(0.4,32,32);
+const zapatosGeom = new THREE.BoxGeometry(0.5,0.5,1);
 const zapatosMaterial = new THREE.MeshStandardMaterial({
     color: 0x000000,
     roughness: 0.2, // Qué tan áspero es
@@ -156,10 +160,10 @@ const zapatosMaterial = new THREE.MeshStandardMaterial({
 
 });
 const ZapatoD = new THREE.Mesh(zapatosGeom, zapatosMaterial);
-ZapatoD.position.set(0.5,-5,0)
+ZapatoD.position.set(0.5,-5,0.2)
 
 const ZapatoI = new THREE.Mesh(zapatosGeom, zapatosMaterial);
-ZapatoI.position.set(-0.5,-5,0)
+ZapatoI.position.set(-0.5,-5,0.2)
 
 // ----- Crear -----
 scene.add(TroncoS,TroncoI,IcosahedronGeometry,PiernaD,PiernaI,BrazoD,BrazoI,Sombrero,Visera,OjoD,OjoI,Boca,ManoD,ManoI,ZapatoD,ZapatoI);
@@ -176,11 +180,15 @@ function animate() {
     const time = Date.now() * 0.002;
     BrazoD.rotation.x = Math.PI /10 + Math.sin(time) * 0.2;
     BrazoI.rotation.x = -Math.PI /10 - Math.sin(time) * 0.2;
+    
+// ----- Animacion Manos -----
+    ManoD.rotation.x = -Math.PI /10 - Math.sin(time) * 0.4;
+    ManoI.rotation.x = +Math.PI /10 + Math.sin(time) * 0.4;
 
     // Pequeña rotación automática
     //---cube.rotation.y += 0.005;
     //---cube.rotation.x += 0.002;
-    
+        
 
     controls.update(); // Necesario por el damping
     renderer.render(scene, camera);
