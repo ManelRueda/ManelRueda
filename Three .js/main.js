@@ -40,8 +40,8 @@ controls.enableDamping = true;
 controls.target.copy(initialCameraTarget);
 
 // --------------------------- OBJETOS CLICABLES ---------------------------
-const cameraObjects = ["Radio"]; // objetos que mueven cámara
-const clickableObjects = ["Radio", "Play", "Pause"]; // todos los clicables
+const cameraObjects = ["Radio","Porfolio"]; // objetos que mueven cámara
+const clickableObjects = ["Radio", "Play", "Pause","Porfolio"]; // todos los clicables
 const spotLights = {}; // foco individual por objeto
 
 // --------------------------- CARGAR MODELOS ---------------------------
@@ -55,7 +55,6 @@ loader.load(
     gltf.scene.traverse((child) => {
       if (child.isMesh) {
         if (clickableObjects.includes(child.name)) {
-          // activar sombras
           child.castShadow = true;
           child.receiveShadow = true;
 
@@ -63,7 +62,7 @@ loader.load(
           if (cameraObjects.includes(child.name)) {
             const objPos = child.getWorldPosition(new THREE.Vector3());
             const spot = new THREE.SpotLight(0xffffff, 15);
-            spot.position.set(objPos.x, objPos.y + 4, objPos.z);
+            spot.position.set(objPos.x, objPos.y + 4, objPos.z); // más alto
             spot.angle = Math.PI / 10;
             spot.penumbra = 0.2;
             spot.decay = 2;
@@ -128,7 +127,6 @@ renderer.domElement.addEventListener('click', (event) => {
 
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children, true);
-
   if (intersects.length === 0) return;
 
   let obj = intersects[0].object;
@@ -137,29 +135,18 @@ renderer.domElement.addEventListener('click', (event) => {
 
   // ---------------- AUDIO ----------------
   if (obj.name === "Play") {
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-    }
+    if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
     currentAudio = new Audio(audioMap["Play"]);
     currentAudio.play();
   }
-
   if (obj.name === "Pause") {
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      currentAudio = null;
-    }
+    if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
   }
 
   // ---------------- INFO ----------------
   if (clickableObjects.includes(obj.name)) {
     infoDiv.style.display = 'block';
-    infoDiv.innerHTML = `
-      <strong>Nombre:</strong> ${obj.name}<br>
-      <p>Haz clic en X para salir</p>
-    `;
+    infoDiv.innerHTML = `<strong>Nombre:</strong> ${obj.name}<br><p>Haz clic en X para salir</p>`;
   }
 
   // ---------------- ENFOQUE CÁMARA ----------------
@@ -168,7 +155,6 @@ renderer.domElement.addEventListener('click', (event) => {
     controls.enabled = false;
 
     const objPos = obj.getWorldPosition(new THREE.Vector3());
-
     const forward = new THREE.Vector3(0, 0, 1);
     const worldQuaternion = obj.getWorldQuaternion(new THREE.Quaternion());
     forward.applyQuaternion(worldQuaternion);
@@ -182,12 +168,13 @@ renderer.domElement.addEventListener('click', (event) => {
 
     // ---------------- LUCES ----------------
     ambientLight.intensity = 0;
+
+    // apagar foco previo
     if (activeSpot) activeSpot.visible = false;
+
+    // encender foco del objeto clicado
     const spot = spotLights[obj.name];
-    if (spot) {
-      spot.visible = true;
-      activeSpot = spot;
-    }
+    if (spot) { spot.visible = true; activeSpot = spot; }
   }
 });
 
@@ -197,7 +184,6 @@ exitButton.addEventListener('click', () => {
 
   camera.position.copy(initialCameraPosition);
   controls.target.copy(initialCameraTarget);
-
   targetPosition = null;
   targetLookAt = null;
 
@@ -209,8 +195,7 @@ exitButton.addEventListener('click', () => {
 
   // ---------------- LUCES ----------------
   ambientLight.intensity = 0.8;
-  if (activeSpot) activeSpot.visible = false;
-  activeSpot = null;
+  if (activeSpot) { activeSpot.visible = false; activeSpot = null; }
 });
 
 // --------------------------- LOOP ---------------------------
