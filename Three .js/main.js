@@ -2,64 +2,92 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'GLTFLoader';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-// --------------------------- A. ESCENA ---------------------------
+// --------------------------- ESCENA ---------------------------
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xB1B8BA);
+scene.background = new THREE.Color(0x636768);
 
-// --------------------------- B. CÁMARA ---------------------------
+// --------------------------- CÁMARA ---------------------------
 const camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(1, 1, 4);
-// Guardamos la posición y objetivo inicial de la cámara
+camera.position.set(0, 2, 6);
 const initialCameraPosition = camera.position.clone();
 const initialCameraTarget = new THREE.Vector3(0, 0, 0);
 
-// --------------------------- C. RENDERER ---------------------------
+// --------------------------- RENDERER ---------------------------
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
-// --------------------------- D. LUCES ---------------------------
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+// --------------------------- LUCES ---------------------------
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
 
 const dirLight = new THREE.DirectionalLight(0xffffff, 1);
 dirLight.position.set(5, 5, 5);
+dirLight.castShadow = true;
+scene.add(dirLight);
 
 const dirLight2 = new THREE.DirectionalLight(0xffffff, 1);
 dirLight2.position.set(-5, -5, -5);
+dirLight2.castShadow = true;
+scene.add(dirLight2);
 
-scene.add(dirLight, dirLight2);
+// --------------------------- CONTROLES ---------------------------
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.copy(initialCameraTarget);
 
-// --------------------------- E. CARGAR MODELOS ---------------------------
+// --------------------------- OBJETOS CLICABLES ---------------------------
+const cameraObjects = ["Radio"]; // objetos que mueven cámara
+const clickableObjects = ["Radio", "Play", "Pause"]; // todos los clicables
+const spotLights = {}; // foco individual por objeto
+
+// --------------------------- CARGAR MODELOS ---------------------------
 const loader = new GLTFLoader();
 
 loader.load(
-  'models/Nombre.glb',
-  (gltf) => scene.add(gltf.scene),
-  undefined,
-  (error) => console.error(error)
-);
-
-loader.load(
-  'models/Radio.glb',
+  'models/Museo.glb',
   (gltf) => {
-    gltf.scene.position.set(2, -2, 0);
     scene.add(gltf.scene);
+
+    gltf.scene.traverse((child) => {
+      if (child.isMesh) {
+        if (clickableObjects.includes(child.name)) {
+          // activar sombras
+          child.castShadow = true;
+          child.receiveShadow = true;
+
+          // si es de cámara, agregar foco
+          if (cameraObjects.includes(child.name)) {
+            const objPos = child.getWorldPosition(new THREE.Vector3());
+            const spot = new THREE.SpotLight(0xffffff, 15);
+            spot.position.set(objPos.x, objPos.y + 4, objPos.z);
+            spot.angle = Math.PI / 10;
+            spot.penumbra = 0.2;
+            spot.decay = 2;
+            spot.distance = 10;
+            spot.target = child;
+            spot.visible = false;
+            spot.castShadow = true;
+            scene.add(spot);
+            scene.add(spot.target);
+            spotLights[child.name] = spot;
+          }
+        }
+      }
+    });
   },
   undefined,
   (error) => console.error(error)
 );
 
-// --------------------------- F. CONTROLES ---------------------------
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-
-// --------------------------- G. CLICK / RAYCASTER ---------------------------
+// --------------------------- RAYCASTER ---------------------------
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-// Div de información
+// --------------------------- DIV INFO ---------------------------
 const infoDiv = document.createElement('div');
 infoDiv.style.position = 'absolute';
 infoDiv.style.top = '20px';
@@ -72,65 +100,42 @@ infoDiv.style.display = 'none';
 infoDiv.style.zIndex = '10';
 document.body.appendChild(infoDiv);
 
-// Variables para animación de cámara
+// --------------------------- BOTÓN X ---------------------------
+const exitButton = document.createElement('button');
+exitButton.innerText = 'X';
+exitButton.style.position = 'absolute';
+exitButton.style.top = '20px';
+exitButton.style.left = '20px';
+exitButton.style.padding = '8px 12px';
+exitButton.style.fontSize = '18px';
+exitButton.style.display = 'none';
+document.body.appendChild(exitButton);
+
+// --------------------------- VARIABLES AUDIO Y CÁMARA ---------------------------
+let currentAudio = null;
+const audioMap = { "Play": "models/Portal Radio Tune.mp3" };
+
 let targetPosition = null;
 let targetLookAt = null;
-let currentLookAt = initialCameraTarget.clone();
+let inFocus = false;
+let activeSpot = null;
 
-// --------------------------- J. AUDIO ---------------------------
-let currentAudio = null;
+// --------------------------- CLICK SOBRE OBJETO ---------------------------
+renderer.domElement.addEventListener('click', (event) => {
 
-// Relación NOMBRE BLENDER → AUDIO
-const audioMap = {
-  "Play": "models/Portal Radio Tune.mp3",
-  // Puedes agregar otros objetos con audio aquí
-  // "Objeto2": "audio/sonido2.mp3",
-};
-
-// --------------------------- CLICK ---------------------------
-renderer.domElement.addEventListener('click', onClick);
-
-function onClick(event) {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children, true);
 
-  // Click fuera → restaurar cámara, ocultar info y parar audio
-  if (intersects.length === 0) {
-    infoDiv.style.display = 'none';
-    targetPosition = initialCameraPosition.clone();
-    targetLookAt = initialCameraTarget.clone();
-    controls.enabled = true;
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      currentAudio = null;
-    }
-    return;
-  }
+  if (intersects.length === 0) return;
 
-  // Buscar objeto con nombre (subir por la jerarquía si hace falta)
   let obj = intersects[0].object;
   while (obj && !obj.name) obj = obj.parent;
+  if (!obj) return;
 
-  if (!obj) {
-    infoDiv.style.display = 'none';
-    targetPosition = initialCameraPosition.clone();
-    targetLookAt = initialCameraTarget.clone();
-    controls.enabled = true;
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      currentAudio = null;
-    }
-    return;
-  }
-
-  console.log("Nombre en Blender:", obj.name);
-
-  // --------------------------- AUDIO ---------------------------
+  // ---------------- AUDIO ----------------
   if (obj.name === "Play") {
     if (currentAudio) {
       currentAudio.pause();
@@ -138,7 +143,9 @@ function onClick(event) {
     }
     currentAudio = new Audio(audioMap["Play"]);
     currentAudio.play();
-  } else if (obj.name === "Pause") {
+  }
+
+  if (obj.name === "Pause") {
     if (currentAudio) {
       currentAudio.pause();
       currentAudio.currentTime = 0;
@@ -146,37 +153,89 @@ function onClick(event) {
     }
   }
 
-  // --------------------------- MOSTRAR INFO ---------------------------
-  infoDiv.style.display = 'block';
-  infoDiv.innerHTML = `<strong>Nombre:</strong> ${obj.name}<br><p>Haz clic fuera del objeto para cerrar</p>`;
+  // ---------------- INFO ----------------
+  if (clickableObjects.includes(obj.name)) {
+    infoDiv.style.display = 'block';
+    infoDiv.innerHTML = `
+      <strong>Nombre:</strong> ${obj.name}<br>
+      <p>Haz clic en X para salir</p>
+    `;
+  }
 
-  // --------------------------- ACERCAR CÁMARA ---------------------------
-  controls.enabled = false;
-  const offset = new THREE.Vector3(0, 0, 2);
-  targetPosition = obj.getWorldPosition(new THREE.Vector3()).clone().add(offset);
-  targetLookAt = obj.getWorldPosition(new THREE.Vector3()).clone();
-}
+  // ---------------- ENFOQUE CÁMARA ----------------
+  if (cameraObjects.includes(obj.name)) {
+    inFocus = true;
+    controls.enabled = false;
 
+    const objPos = obj.getWorldPosition(new THREE.Vector3());
 
-        // --------------------------- H. LOOP / ANIMACIÓN ---------------------------
-        function animate() {
-          requestAnimationFrame(animate);
+    const forward = new THREE.Vector3(0, 0, 1);
+    const worldQuaternion = obj.getWorldQuaternion(new THREE.Quaternion());
+    forward.applyQuaternion(worldQuaternion);
 
-        if (targetPosition && targetLookAt) {
-          camera.position.lerp(targetPosition, 0.1);
-          currentLookAt.lerp(targetLookAt, 0.1);
-          camera.lookAt(currentLookAt);
+    const distance = 0.5;
+    targetPosition = objPos.clone().add(forward.multiplyScalar(distance));
+    targetPosition.y += 0.3;
+    targetLookAt = objPos.clone();
+
+    exitButton.style.display = 'block';
+
+    // ---------------- LUCES ----------------
+    ambientLight.intensity = 0;
+    if (activeSpot) activeSpot.visible = false;
+    const spot = spotLights[obj.name];
+    if (spot) {
+      spot.visible = true;
+      activeSpot = spot;
     }
+  }
+});
 
-        controls.update();
-        renderer.render(scene, camera);
+// --------------------------- BOTÓN X ---------------------------
+exitButton.addEventListener('click', () => {
+  inFocus = false;
+
+  camera.position.copy(initialCameraPosition);
+  controls.target.copy(initialCameraTarget);
+
+  targetPosition = null;
+  targetLookAt = null;
+
+  exitButton.style.display = 'none';
+  infoDiv.style.display = 'none';
+
+  controls.enabled = true;
+  controls.update();
+
+  // ---------------- LUCES ----------------
+  ambientLight.intensity = 0.8;
+  if (activeSpot) activeSpot.visible = false;
+  activeSpot = null;
+});
+
+// --------------------------- LOOP ---------------------------
+function animate() {
+  requestAnimationFrame(animate);
+
+  if (targetPosition && targetLookAt) {
+    camera.position.lerp(targetPosition, 0.08);
+    controls.target.lerp(targetLookAt, 0.08);
+
+    if (camera.position.distanceTo(targetPosition) < 0.01) {
+      targetPosition = null;
+      targetLookAt = null;
+    }
+  }
+
+  controls.update();
+  renderer.render(scene, camera);
 }
 
-        animate();
+animate();
 
-// --------------------------- I. AJUSTE DE VENTANA ---------------------------
+// --------------------------- RESIZE ---------------------------
 window.addEventListener('resize', () => {
-          camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 });
