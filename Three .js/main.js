@@ -40,9 +40,9 @@ controls.enableDamping = true;
 controls.target.copy(initialCameraTarget);
 
 // --------------------------- OBJETOS CLICABLES ---------------------------
-const cameraObjects = ["Radio","Porfolio"]; // objetos que mueven cámara
-const clickableObjects = ["Radio", "Play", "Pause","Porfolio"]; // todos los clicables
-const spotLights = {}; // foco individual por objeto
+const cameraObjects = ["Radio","Porfolio"];
+const clickableObjects = ["Radio", "Play", "Pause","Porfolio"];
+const spotLights = {};
 
 // --------------------------- CARGAR MODELOS ---------------------------
 const loader = new GLTFLoader();
@@ -52,30 +52,36 @@ loader.load(
   (gltf) => {
     scene.add(gltf.scene);
 
+    // activar sombras a todos los meshes clicables
     gltf.scene.traverse((child) => {
       if (child.isMesh) {
         if (clickableObjects.includes(child.name)) {
           child.castShadow = true;
           child.receiveShadow = true;
-
-          // si es de cámara, agregar foco
-          if (cameraObjects.includes(child.name)) {
-            const objPos = child.getWorldPosition(new THREE.Vector3());
-            const spot = new THREE.SpotLight(0xffffff, 15);
-            spot.position.set(objPos.x, objPos.y + 4, objPos.z); // más alto
-            spot.angle = Math.PI / 10;
-            spot.penumbra = 0.2;
-            spot.decay = 2;
-            spot.distance = 10;
-            spot.target = child;
-            spot.visible = false;
-            spot.castShadow = true;
-            scene.add(spot);
-            scene.add(spot.target);
-            spotLights[child.name] = spot;
-          }
         }
       }
+    });
+
+    // crear focos
+    cameraObjects.forEach(name => {
+      const object = gltf.scene.getObjectByName(name);
+      if (!object) {
+        console.warn("No se encontró el objeto:", name);
+        return;
+      }
+
+      const spot = new THREE.SpotLight(0xffffff, 15);
+      spot.angle = Math.PI / 10;
+      spot.penumbra = 0.2;
+      spot.decay = 2;
+      spot.distance = 10;
+      spot.castShadow = true;
+      spot.visible = false;
+
+      scene.add(spot);
+      scene.add(spot.target);
+
+      spotLights[name] = { light: spot, object: object };
     });
   },
   undefined,
@@ -110,14 +116,38 @@ exitButton.style.fontSize = '18px';
 exitButton.style.display = 'none';
 document.body.appendChild(exitButton);
 
+// --------------------------- OVERLAY PARA PORFOLIO ---------------------------
+const overlay = document.createElement('div');
+overlay.style.position = 'fixed';
+overlay.style.top = 0;
+overlay.style.left = 0;
+overlay.style.width = '100%';
+overlay.style.height = '100%';
+overlay.style.backgroundColor = 'rgba(0,0,0,0.6)';
+overlay.style.display = 'none';
+overlay.style.justifyContent = 'center';
+overlay.style.alignItems = 'center';
+overlay.style.zIndex = 100;
+document.body.appendChild(overlay);
+
+const portfolioImage = document.createElement('img');
+portfolioImage.src = 'models/Willy.jpg'; // tu imagen
+portfolioImage.style.maxWidth = '50%';
+portfolioImage.style.maxHeight = '50%';
+portfolioImage.style.border = '2px solid white';
+overlay.appendChild(portfolioImage);
+
+// cerrar overlay al hacer click
+overlay.addEventListener('click', () => { overlay.style.display = 'none'; });
+
 // --------------------------- VARIABLES AUDIO Y CÁMARA ---------------------------
 let currentAudio = null;
 const audioMap = { "Play": "models/Portal Radio Tune.mp3" };
 
 let targetPosition = null;
 let targetLookAt = null;
-let inFocus = false;
 let activeSpot = null;
+let showPortfolioOnFocus = false;
 
 // --------------------------- CLICK SOBRE OBJETO ---------------------------
 renderer.domElement.addEventListener('click', (event) => {
@@ -130,7 +160,7 @@ renderer.domElement.addEventListener('click', (event) => {
   if (intersects.length === 0) return;
 
   let obj = intersects[0].object;
-  while (obj && !obj.name) obj = obj.parent;
+  while (obj && !clickableObjects.includes(obj.name)) obj = obj.parent;
   if (!obj) return;
 
   // ---------------- AUDIO ----------------
@@ -144,46 +174,53 @@ renderer.domElement.addEventListener('click', (event) => {
   }
 
   // ---------------- INFO ----------------
-  if (clickableObjects.includes(obj.name)) {
-    infoDiv.style.display = 'block';
-    infoDiv.innerHTML = `<strong>Nombre:</strong> ${obj.name}<br><p>Haz clic en X para salir</p>`;
-  }
+  infoDiv.style.display = 'block';
+  infoDiv.innerHTML = `<strong>Nombre:</strong> ${obj.name}<br><p>Haz clic en X para salir</p>`;
 
   // ---------------- ENFOQUE CÁMARA ----------------
   if (cameraObjects.includes(obj.name)) {
-    inFocus = true;
-    controls.enabled = false;
 
-    const objPos = obj.getWorldPosition(new THREE.Vector3());
+    const data = spotLights[obj.name];
+    if (!data) return;
+
+    const object = data.object;
+    const spot = data.light;
+
+    const objPos = new THREE.Vector3();
+    object.getWorldPosition(objPos);
+
+    // mover foco encima del objeto
+    spot.position.set(objPos.x, objPos.y + 4, objPos.z);
+    spot.target.position.copy(objPos);
+
+    if (activeSpot) activeSpot.visible = false;
+    spot.visible = true;
+    activeSpot = spot;
+
+    ambientLight.intensity = 0;
+
     const forward = new THREE.Vector3(0, 0, 1);
-    const worldQuaternion = obj.getWorldQuaternion(new THREE.Quaternion());
+    const worldQuaternion = object.getWorldQuaternion(new THREE.Quaternion());
     forward.applyQuaternion(worldQuaternion);
 
-    const distance = 0.5;
-    targetPosition = objPos.clone().add(forward.multiplyScalar(distance));
+    targetPosition = objPos.clone().add(forward.multiplyScalar(0.5));
     targetPosition.y += 0.3;
     targetLookAt = objPos.clone();
 
+    controls.enabled = false;
     exitButton.style.display = 'block';
 
-    // ---------------- LUCES ----------------
-    ambientLight.intensity = 0;
-
-    // apagar foco previo
-    if (activeSpot) activeSpot.visible = false;
-
-    // encender foco del objeto clicado
-    const spot = spotLights[obj.name];
-    if (spot) { spot.visible = true; activeSpot = spot; }
+    // si es Porfolio, marcar para mostrar overlay al llegar
+    showPortfolioOnFocus = (obj.name === "Porfolio");
   }
 });
 
 // --------------------------- BOTÓN X ---------------------------
 exitButton.addEventListener('click', () => {
-  inFocus = false;
 
   camera.position.copy(initialCameraPosition);
   controls.target.copy(initialCameraTarget);
+
   targetPosition = null;
   targetLookAt = null;
 
@@ -193,9 +230,14 @@ exitButton.addEventListener('click', () => {
   controls.enabled = true;
   controls.update();
 
-  // ---------------- LUCES ----------------
-  ambientLight.intensity = 0.8;
-  if (activeSpot) { activeSpot.visible = false; activeSpot = null; }
+  ambientLight.intensity = 0.6;
+
+  if (activeSpot) {
+    activeSpot.visible = false;
+    activeSpot = null;
+  }
+
+  overlay.style.display = 'none';
 });
 
 // --------------------------- LOOP ---------------------------
@@ -209,6 +251,12 @@ function animate() {
     if (camera.position.distanceTo(targetPosition) < 0.01) {
       targetPosition = null;
       targetLookAt = null;
+
+      // mostrar overlay si corresponde
+      if (showPortfolioOnFocus) {
+        overlay.style.display = "flex";
+        showPortfolioOnFocus = false;
+      }
     }
   }
 
