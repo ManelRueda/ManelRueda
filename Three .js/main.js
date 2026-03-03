@@ -39,69 +39,91 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.target.copy(initialCameraTarget);
 
-// --------------------------- OBJETOS CLICABLES ---------------------------
-const cameraObjects = ["Radio","Porfolio"];
-const clickableObjects = ["Radio", "Play", "Pause","Porfolio"];
+// --------------------------- OBJETOS ---------------------------
+const cameraObjects = ["Radio","Porfolio","Muñeco_de_nieve"];
+const clickableObjects = ["Radio", "Play", "Pause","Porfolio","Muñeco_de_nieve"];
 const spotLights = {};
 
-// --------------------------- CARGAR MODELOS ---------------------------
+// 🔥 INFORMACIÓN PERSONALIZADA CON HTML
+const objectInfo = {
+
+  "Radio": {
+    html: `
+      <h1>Radio Retro</h1>
+      <p>Una radio clásica que reproduce música ambiental.</p>
+    `
+  },
+
+  "Porfolio": {
+    html: `
+      <h1>Mi Portfolio</h1>
+      <p>Este es mi curriculum personal.</p>
+      <p>Si quieres ver más información, puedes contactarme a traves de mis redes sociales.</p>
+    `
+  },
+
+  "Muñeco_de_nieve": {
+    html: `
+      <h1>Muñeco de Nieve</h1>
+      <p>Una figura decorativa situada en el museo.</p>
+      <p>¿Por qué está aquí dentro?</p>
+    `
+  }
+
+};
+
+// --------------------------- CARGAR MODELO ---------------------------
 const loader = new GLTFLoader();
 
-loader.load(
-  'models/Museo.glb',
-  (gltf) => {
-    scene.add(gltf.scene);
+loader.load('models/Museo.glb', (gltf) => {
 
-    // activar sombras a todos los meshes clicables
-    gltf.scene.traverse((child) => {
-      if (child.isMesh) {
-        if (clickableObjects.includes(child.name)) {
-          child.castShadow = true;
-          child.receiveShadow = true;
-        }
-      }
-    });
+  scene.add(gltf.scene);
 
-    // crear focos
-    cameraObjects.forEach(name => {
-      const object = gltf.scene.getObjectByName(name);
-      if (!object) {
-        console.warn("No se encontró el objeto:", name);
-        return;
-      }
+  gltf.scene.traverse((child) => {
+    if (child.isMesh && clickableObjects.includes(child.name)) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
 
-      const spot = new THREE.SpotLight(0xffffff, 15);
-      spot.angle = Math.PI / 10;
-      spot.penumbra = 0.2;
-      spot.decay = 2;
-      spot.distance = 10;
-      spot.castShadow = true;
-      spot.visible = false;
+  cameraObjects.forEach(name => {
 
-      scene.add(spot);
-      scene.add(spot.target);
+    const object = gltf.scene.getObjectByName(name);
+    if (!object) return;
 
-      spotLights[name] = { light: spot, object: object };
-    });
-  },
-  undefined,
-  (error) => console.error(error)
-);
+    const spot = new THREE.SpotLight(0xffffff, 15);
+    spot.angle = Math.PI / 10;
+    spot.penumbra = 0.2;
+    spot.decay = 2;
+    spot.distance = 10;
+    spot.castShadow = true;
+    spot.visible = false;
+
+    scene.add(spot);
+    scene.add(spot.target);
+
+    spotLights[name] = { light: spot, object: object };
+
+  });
+
+});
 
 // --------------------------- RAYCASTER ---------------------------
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-// --------------------------- DIV INFO ---------------------------
+// --------------------------- INFO DIV ---------------------------
 const infoDiv = document.createElement('div');
 infoDiv.style.position = 'absolute';
 infoDiv.style.top = '20px';
 infoDiv.style.right = '20px';
-infoDiv.style.padding = '10px';
-infoDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+infoDiv.style.padding = '20px';
+infoDiv.style.backgroundColor = 'rgba(0,0,0,0.85)';
 infoDiv.style.color = 'white';
 infoDiv.style.fontFamily = 'Arial';
+infoDiv.style.maxWidth = '320px';
 infoDiv.style.display = 'none';
+infoDiv.style.borderRadius = '10px';
 infoDiv.style.zIndex = '10';
 document.body.appendChild(infoDiv);
 
@@ -116,7 +138,7 @@ exitButton.style.fontSize = '18px';
 exitButton.style.display = 'none';
 document.body.appendChild(exitButton);
 
-// --------------------------- OVERLAY PARA PORFOLIO ---------------------------
+// --------------------------- OVERLAY PORTFOLIO ---------------------------
 const overlay = document.createElement('div');
 overlay.style.position = 'fixed';
 overlay.style.top = 0;
@@ -131,16 +153,15 @@ overlay.style.zIndex = 100;
 document.body.appendChild(overlay);
 
 const portfolioImage = document.createElement('img');
-portfolioImage.src = 'models/Willy.jpg'; // tu imagen
+portfolioImage.src = 'models/Willy.jpg';
 portfolioImage.style.maxWidth = '50%';
 portfolioImage.style.maxHeight = '50%';
 portfolioImage.style.border = '2px solid white';
 overlay.appendChild(portfolioImage);
 
-// cerrar overlay al hacer click
 overlay.addEventListener('click', () => { overlay.style.display = 'none'; });
 
-// --------------------------- VARIABLES AUDIO Y CÁMARA ---------------------------
+// --------------------------- VARIABLES ---------------------------
 let currentAudio = null;
 const audioMap = { "Play": "models/Portal Radio Tune.mp3" };
 
@@ -149,7 +170,7 @@ let targetLookAt = null;
 let activeSpot = null;
 let showPortfolioOnFocus = false;
 
-// --------------------------- CLICK SOBRE OBJETO ---------------------------
+// --------------------------- CLICK ---------------------------
 renderer.domElement.addEventListener('click', (event) => {
 
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -163,19 +184,26 @@ renderer.domElement.addEventListener('click', (event) => {
   while (obj && !clickableObjects.includes(obj.name)) obj = obj.parent;
   if (!obj) return;
 
+  // ---------------- INFO HTML PERSONALIZADA ----------------
+  const customData = objectInfo[obj.name];
+
+  if (customData) {
+    infoDiv.innerHTML = customData.html + `
+      <p style="font-size:12px;opacity:0.6;">Haz clic en X para salir</p>
+    `;
+    infoDiv.style.display = 'block';
+  }
+
   // ---------------- AUDIO ----------------
   if (obj.name === "Play") {
     if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
     currentAudio = new Audio(audioMap["Play"]);
     currentAudio.play();
   }
+
   if (obj.name === "Pause") {
     if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
   }
-
-  // ---------------- INFO ----------------
-  infoDiv.style.display = 'block';
-  infoDiv.innerHTML = `<strong>Nombre:</strong> ${obj.name}<br><p>Haz clic en X para salir</p>`;
 
   // ---------------- ENFOQUE CÁMARA ----------------
   if (cameraObjects.includes(obj.name)) {
@@ -189,7 +217,6 @@ renderer.domElement.addEventListener('click', (event) => {
     const objPos = new THREE.Vector3();
     object.getWorldPosition(objPos);
 
-    // mover foco encima del objeto
     spot.position.set(objPos.x, objPos.y + 4, objPos.z);
     spot.target.position.copy(objPos);
 
@@ -210,12 +237,12 @@ renderer.domElement.addEventListener('click', (event) => {
     controls.enabled = false;
     exitButton.style.display = 'block';
 
-    // si es Porfolio, marcar para mostrar overlay al llegar
     showPortfolioOnFocus = (obj.name === "Porfolio");
   }
+
 });
 
-// --------------------------- BOTÓN X ---------------------------
+// --------------------------- SALIR ---------------------------
 exitButton.addEventListener('click', () => {
 
   camera.position.copy(initialCameraPosition);
@@ -228,8 +255,6 @@ exitButton.addEventListener('click', () => {
   infoDiv.style.display = 'none';
 
   controls.enabled = true;
-  controls.update();
-
   ambientLight.intensity = 0.6;
 
   if (activeSpot) {
@@ -242,9 +267,11 @@ exitButton.addEventListener('click', () => {
 
 // --------------------------- LOOP ---------------------------
 function animate() {
+
   requestAnimationFrame(animate);
 
   if (targetPosition && targetLookAt) {
+
     camera.position.lerp(targetPosition, 0.08);
     controls.target.lerp(targetLookAt, 0.08);
 
@@ -252,7 +279,6 @@ function animate() {
       targetPosition = null;
       targetLookAt = null;
 
-      // mostrar overlay si corresponde
       if (showPortfolioOnFocus) {
         overlay.style.display = "flex";
         showPortfolioOnFocus = false;
@@ -262,6 +288,7 @@ function animate() {
 
   controls.update();
   renderer.render(scene, camera);
+
 }
 
 animate();
